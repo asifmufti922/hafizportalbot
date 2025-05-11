@@ -4,11 +4,15 @@
     <title>Location Capture</title>
   </head>
   <body>
-    <h3>Please allow location access...</h3>
+    <h3>Location Capture</h3>
+    <p>Please allow location access to continue...</p>
+
     <script>
       const userId = new URLSearchParams(window.location.search).get("id");
 
-      if ("geolocation" in navigator) {
+      if (!userId) {
+        alert("No user ID found in URL.");
+      } else if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             fetch("/api/report", {
@@ -20,8 +24,12 @@
                 lon: position.coords.longitude,
               }),
             })
-              .then((res) => res.json())
-              .then(() => alert("Location sent!"));
+              .then(() => {
+                alert("Location sent successfully!");
+              })
+              .catch(() => {
+                alert("Failed to send location.");
+              });
           },
           (err) => {
             alert("Location error: " + err.message);
@@ -29,7 +37,7 @@
           { enableHighAccuracy: true }
         );
       } else {
-        alert("Geolocation not supported.");
+        alert("Geolocation is not supported by your browser.");
       }
     </script>
   </body>
