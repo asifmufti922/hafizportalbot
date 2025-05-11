@@ -1,44 +1,108 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Location Capture</title>
-  </head>
-  <body>
-    <h3>Location Capture</h3>
-    <p>Please allow location access to continue...</p>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Location Required</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #f0f4f8, #dfe9f3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
 
-    <script>
-      const userId = new URLSearchParams(window.location.search).get("id");
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 30px;
+      max-width: 360px;
+      text-align: center;
+      animation: fadeIn 1s ease-out;
+    }
 
-      if (!userId) {
-        alert("No user ID found in URL.");
-      } else if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            fetch("/api/report", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                user_id: userId,
-                lat: position.coords.latitude,
-                lon: position.coords.longitude,
-              }),
-            })
-              .then(() => {
-                alert("Location sent successfully!");
-              })
-              .catch(() => {
-                alert("Failed to send location.");
-              });
-          },
-          (err) => {
-            alert("Location error: " + err.message);
-          },
-          { enableHighAccuracy: true }
-        );
-      } else {
-        alert("Geolocation is not supported by your browser.");
+    .card h2 {
+      margin-top: 0;
+      color: #0077cc;
+    }
+
+    .card p {
+      color: #444;
+      font-size: 15px;
+    }
+
+    .btn {
+      margin-top: 25px;
+      padding: 15px 30px;
+      background-color: #2ecc71;
+      border: none;
+      border-radius: 50px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #27ae60;
+    }
+
+    .loader {
+      width: 100%;
+      background: #e1e4e8;
+      border-radius: 50px;
+      overflow: hidden;
+      margin-top: 20px;
+      height: 10px;
+    }
+
+    .loader-bar {
+      width: 0%;
+      height: 100%;
+      background: #3498db;
+      animation: load 3s ease-out forwards;
+    }
+
+    @keyframes load {
+      to { width: 100%; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Enable Location</h2>
+    <p>For your security and personalized experience, we need your precise location.</p>
+    <div class="loader"><div class="loader-bar"></div></div>
+    <button class="btn" onclick="requestLocation()">Continue</button>
+  </div>
+
+  <script>
+    function requestLocation() {
+      if (!navigator.geolocation) {
+        alert("Geolocation not supported.");
+        return;
       }
-    </script>
-  </body>
+
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          alert("Location accessed. Thanks!");
+          // send location to server here
+        },
+        err => {
+          alert("Permission denied or error. Please enable location services.");
+        }
+      );
+    }
+  </script>
+</body>
 </html>
