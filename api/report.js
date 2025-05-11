@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   const token = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k';
-  const baseUrl = 'https://hafizbotspy.vercel.app'; // Replace with your domain
+  const baseUrl = 'https://hafizportalspy.vercel.app'; // Replace with your domain
 
   if (req.method === 'POST') {
     const body = req.body;
