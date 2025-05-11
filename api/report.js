@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   const text = `Live Location:\nLatitude: ${lat}\nLongitude: ${lon}\n[Google Maps](https://maps.google.com/?q=${lat},${lon})`;
 
-  await fetch(`https://api.telegram.org/bot7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k/sendMessage`, {
+  await fetch(`https://api.telegram.org/botYOUR_BOT_TOKEN/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
