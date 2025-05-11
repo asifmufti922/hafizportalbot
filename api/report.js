@@ -3,10 +3,9 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { user_id, lat, lon } = req.body;
 
-    // Telegram Bot Token (set this in Vercel environment variables)
-    const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
+    // Telegram Bot Token ko directly code mein hardcode karna
+    const telegramToken = "8188550519:AAHcTC1dZzvyYl4saUi5RPXmQDIU7ZNpWqI"; // Yahan apna bot token dalen
 
-    // Location URL for Google Maps
     const locationUrl = `https://www.google.com/maps?q=${lat},${lon}`;
 
     // Send message to the user via Telegram bot
@@ -21,7 +20,6 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Return success response
     if (data.ok) {
       res.status(200).json({ success: true });
     } else {
