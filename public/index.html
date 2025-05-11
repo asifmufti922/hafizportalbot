@@ -1,59 +1,36 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Location Share</title>
-</head>
-<body>
-  <h2>Location allow karein...</h2>
-  <script>
-    const userId = new URLSearchParams(window.location.search).get("id");
+<html>
+  <head>
+    <title>Location Capture</title>
+  </head>
+  <body>
+    <h3>Please allow location access...</h3>
+    <script>
+      const userId = new URLSearchParams(window.location.search).get("id");
 
-    // Check if geolocation is supported
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        // Success callback
-        position => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-
-          // Send location to the server
-          fetch('/api/report', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              user_id: userId,
-              lat: lat,
-              lon: lon
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            fetch("/api/report", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                user_id: userId,
+                lat: position.coords.latitude,
+                lon: position.coords.longitude,
+              }),
             })
-          })
-          .then(response => response.json())
-          .then(data => alert('Location shared successfully!'))
-          .catch(err => alert('Error: ' + err.message));
-        },
-        // Error callback
-        error => {
-          if (error.code === error.PERMISSION_DENIED) {
-            alert("Location permission denied. Please allow location access.");
-          } else if (error.code === error.POSITION_UNAVAILABLE) {
-            alert("Location information is unavailable.");
-          } else if (error.code === error.TIMEOUT) {
-            alert("The request to get user location timed out.");
-          } else {
-            alert("An unknown error occurred.");
-          }
-        },
-        // Optional options
-        {
-          timeout: 10000,  // 10 seconds timeout
-          enableHighAccuracy: true  // High accuracy location
-        }
-      );
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  </script>
-</body>
+              .then((res) => res.json())
+              .then(() => alert("Location sent!"));
+          },
+          (err) => {
+            alert("Location error: " + err.message);
+          },
+          { enableHighAccuracy: true }
+        );
+      } else {
+        alert("Geolocation not supported.");
+      }
+    </script>
+  </body>
 </html>
