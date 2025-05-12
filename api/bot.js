@@ -1,26 +1,31 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).end("Only POST allowed");
+// Referral logic for entry into second bot (hafizportalbot) const BOT_TOKEN = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k'; const SECOND_BOT_USERNAME = 'hafizportalbot'; const REQUIRED_REFERRALS = 10;
 
-  const data = req.body;
-  if (data.message && data.message.text === "/start") {
-    const chatId = data.message.chat.id;
-    const userName = data.message.from.first_name || "User";
+let referrals = {}; // Use a proper DB in production
 
-    const link = `https://hafizportalspy.vercel.app/?id=${chatId}`;
+export default async function handler(req, res) { if (req.method !== 'POST') return res.status(405).end();
 
-    const text = `Salam ${userName},\nClick the link below to share your location:\n${link}`;
+const body = req.body; const message = body.message;
 
-    await fetch(`https://api.telegram.org/bot7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-      }),
-    });
+if (!message || !message.chat || !message.chat.id) { return res.status(200).end(); }
 
-    return res.status(200).json({ ok: true });
-  }
+const chat_id = message.chat.id; const text = message.text || ''; const userId = chat_id.toString();
 
-  res.status(200).json({ ok: true, message: "Ignored" });
-}
+referrals[userId] = referrals[userId] || 0;
+
+if (text === '/refer') { const referLink = https://t.me/YOUR_MAIN_BOT_USERNAME?start=${chat_id}; const reply = `📢 Share this link with friends: ${referLink}
+
+Each successful join counts as a referral!`; await sendMessage(chat_id, reply); }
+
+else if (text.startsWith('/start ') && text.split(' ').length === 2) { const referrerId = text.split(' ')[1]; if (referrerId !== chat_id.toString()) { referrals[referrerId] = (referrals[referrerId] || 0) + 1; } await sendMessage(chat_id, 👋 Welcome! Your referral has been recorded.); }
+
+// Default reply for all commands const remaining = REQUIRED_REFERRALS - referrals[userId]; const reply = `🔐 Access Locked!
+
+🔸 Apko @${SECOND_BOT_USERNAME} par access chahiye? Pehle ${remaining} logon ko refer karein.
+
+🧠 Yeh hack use karne ke liye 10 referral complete karein aur admin se rabta karein.
+!`; await sendMessage(chat_id, reply);
+
+return res.status(200).end(); }
+
+async function sendMessage(chat_id, text) { const url = https://api.telegram.org/bot${BOT_TOKEN}/sendMessage; await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id, text, parse_mode: 'Markdown' }) }); }
+
