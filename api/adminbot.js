@@ -1,6 +1,7 @@
 // Admin bot handler to verify approved users and give unique link
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const BASE_URL = 'https://hafizportalspy.vercel.app'; // Replace with your site const approvedUsers = new Set(['123456789']); // Add approved Telegram user IDs here
+const BASE_URL = 'https://hafizportalspy.vercel.app'; // Replace with your site 
+const approvedUsers = new Set(['7187468717']); // Add approved Telegram user IDs here
 
 export default async function handler(req, res) { if (req.method !== 'POST') return res.status(405).end();
 
