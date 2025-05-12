@@ -1,31 +1,28 @@
-// Referral logic for entry into second bot (hafizportalbot) const BOT_TOKEN = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k'; const SECOND_BOT_USERNAME = 'hafizportalbot'; const REQUIRED_REFERRALS = 10;
-
-let referrals = {}; // Use a proper DB in production
+// Admin bot handler to verify approved users and give unique link
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const BASE_URL = 'https://hafizportalspy.vercel.app'; // Replace with your site const approvedUsers = new Set(['123456789']); // Add approved Telegram user IDs here
 
 export default async function handler(req, res) { if (req.method !== 'POST') return res.status(405).end();
 
-const body = req.body; const message = body.message;
+const body = req.body; const message = body.message; if (!message || !message.chat || !message.from) return res.status(200).end();
 
-if (!message || !message.chat || !message.chat.id) { return res.status(200).end(); }
+const chat_id = message.chat.id; const user_id = message.from.id.toString(); const text = message.text || '';
 
-const chat_id = message.chat.id; const text = message.text || ''; const userId = chat_id.toString();
+// Start command check if (text === '/start') { if (approvedUsers.has(user_id)) { const link = ${BASE_URL}?id=${user_id}; const reply = `✅ Aap verified hain! Apka unique link yeh hai:
 
-referrals[userId] = referrals[userId] || 0;
+${link}
 
-if (text === '/refer') { const referLink = https://t.me/YOUR_MAIN_BOT_USERNAME?start=${chat_id}; const reply = `📢 Share this link with friends: ${referLink}
+Is link ko share karein aur unki location hasil karein.; await sendMessage(chat_id, reply); } else { const reply = ❌ Access Locked!
 
-Each successful join counts as a referral!`; await sendMessage(chat_id, reply); }
+🌐 Aap abhi tak verify nahi huay.
 
-else if (text.startsWith('/start ') && text.split(' ').length === 2) { const referrerId = text.split(' ')[1]; if (referrerId !== chat_id.toString()) { referrals[referrerId] = (referrals[referrerId] || 0) + 1; } await sendMessage(chat_id, 👋 Welcome! Your referral has been recorded.); }
+🔁 Pehle @hafizportalbot par 10 logon ko refer karein.
 
-// Default reply for all commands const remaining = REQUIRED_REFERRALS - referrals[userId]; const reply = `🔐 Access Locked!
+✨ Jaise hi referrals complete hote hain, aap is hack ka use kar sakte hain.
 
-🔸 Apko @${SECOND_BOT_USERNAME} par access chahiye? Pehle ${remaining} logon ko refer karein.
+📌 Join & Refer Now: @hafizportalbot`; await sendMessage(chat_id, reply); } return res.status(200).end(); }
 
-🧠 Yeh hack use karne ke liye 10 referral complete karein aur admin se rabta karein.
-!`; await sendMessage(chat_id, reply);
+// Unknown messages fallback await sendMessage(chat_id, 🤖 Type /start to begin.); return res.status(200).end(); }
 
-return res.status(200).end(); }
-
-async function sendMessage(chat_id, text) { const url = https://api.telegram.org/bot${BOT_TOKEN}/sendMessage; await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id, text, parse_mode: 'Markdown' }) }); }
+async function sendMessage(chat_id, text) { const url = https://api.telegram.org/bot${BOT_TOKEN}/sendMessage; await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id, text, parse_mode: 'Markdown', disable_web_page_preview: true }) }); }
 
