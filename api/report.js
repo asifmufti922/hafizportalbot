@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing parameters' });
   }
 
-  const BOT_TOKEN = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k'; // <-- Replace with your bot token
+  const BOT_TOKEN = process.env.BOT_TOKEN;
   const googleMapLink = `https://maps.google.com/?q=${latitude},${longitude}`;
   const message = `📍 Location Received:\nLat: ${latitude}\nLon: ${longitude}\n\n[View on Google Maps](${googleMapLink})`;
 
